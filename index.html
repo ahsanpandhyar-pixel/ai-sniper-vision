@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI SNIPER | FINAL RECONSTRUCTION</title>
+    <title>AI SNIPER | FINAL REPAIR</title>
     <style>
         :root { --neon: #00ff88; --danger: #ff4d4d; --bg: #05070b; --card: #0d1117; --blue: #00d2ff; }
         body { background: var(--bg); color: #fff; font-family: sans-serif; margin: 0; padding: 10px; }
-        .chat-panel { background: var(--card); border-left: 5px solid var(--blue); border-radius: 12px; padding: 15px; min-height: 80px; margin-bottom: 12px; font-size: 14px; color: var(--blue); font-weight: bold; border-top: 1px solid #222; }
+        .chat-panel { background: var(--card); border-left: 5px solid var(--blue); border-radius: 12px; padding: 15px; min-height: 80px; margin-bottom: 12px; font-size: 14px; color: var(--blue); font-weight: bold; }
         .vision-box { background: #000; border: 2px solid var(--neon); border-radius: 15px; overflow: hidden; margin-bottom: 12px; position: relative; min-height: 250px; display: flex; align-items: center; justify-content: center; }
         .label { position: absolute; top: 10px; left: 10px; font-size: 10px; color: var(--neon); font-weight: bold; background: rgba(0,0,0,0.8); padding: 4px 10px; border-radius: 5px; z-index: 100; }
-        #duplicate-view { width: 100%; border-radius: 12px; display: none; }
-        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+        #duplicate-view { width: 100%; border-radius: 12px; display: none; object-fit: contain; }
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
         .btn-row { display: flex; gap: 8px; margin-bottom: 12px; }
         .btn { flex: 1; background: #1e222d; color: #fff; padding: 15px; border-radius: 10px; text-align: center; border: 1px solid #333; font-weight: bold; cursor: pointer; }
         .master-btn { width: 100%; padding: 20px; border-radius: 12px; font-size: 26px; font-weight: 900; border: none; text-transform: uppercase; background: #222; color: #444; }
@@ -19,11 +19,11 @@
 </head>
 <body>
 
-<div class="chat-panel" id="ai-chat">Bhai, setup full rebuild kar diya hai. Ab screenshot upload karo, pehle Digital Twin banega phir AI levels mark karega...</div>
+<div class="chat-panel" id="ai-chat">Bhai, setup full repair kar diya hai. Ab Screenshot upload karo, 100% image nazar aaye gi aur AI signal dega...</div>
 
 <div class="btn-row">
     <label class="btn" for="f-up">🖼️ UPLOAD CHART</label>
-    <input type="file" id="f-up" style="display:none" onchange="handleProcess(event)">
+    <input type="file" id="f-up" style="display:none" onchange="handleProcess(event)" accept="image/*">
     <div class="btn" onclick="location.reload()" style="background:var(--danger)">🔄 REFRESH</div>
 </div>
 
@@ -45,19 +45,20 @@
         const file = event.target.files[0];
         if (!file) return;
 
-        const reader = new FileReader();
         chat.innerText = "Bhai, Duplicate tayyar ho raha hai...";
 
+        // Naya tareeqa: BLOB URL use karein (Mobile fix)
+        const objectURL = URL.createObjectURL(file);
+        dupView.src = objectURL;
+        dupView.style.display = "block";
+
+        const reader = new FileReader();
         reader.onload = function(e) {
-            // Duplicate Box Fix
-            dupView.src = e.target.result;
-            dupView.style.display = "block";
-            
             const img = new Image();
             img.onload = function() {
                 canvas.width = img.width;
                 canvas.height = img.height;
-                chat.innerText = "Bhai, Duplicate ban gaya! Ab AI pixels scan kar raha hai...";
+                chat.innerText = "Bhai, Duplicate ban gaya! Ab AI analysis shuru hai...";
                 runAnalysis(e.target.result.split(',')[1]);
             };
             img.src = e.target.result;
@@ -66,7 +67,7 @@
     }
 
     async function runAnalysis(base64) {
-        const prompt = "Analyze this Microsoft OTC chart. Identify SMC (Order Blocks) and SNR. Talk in Roman Urdu starting with 'Bhai...'. Give CALL or PUT, Expiry, and Confidence.";
+        const prompt = "Analyze this binary options chart. Identify SMC (Order Blocks) and SNR. Talk in Roman Urdu starting with 'Bhai...'. Give CALL or PUT, Expiry, and Confidence.";
         
         try {
             const response = await fetch(`https://googleapis.com{API_KEY}`, {
@@ -81,25 +82,24 @@
             const aiText = data.candidates[0].content.parts[0].text;
             chat.innerText = aiText;
 
-            // Drawing AI Mappings
             drawAILevels();
 
             if(/call|up|buy/i.test(aiText.toLowerCase())) {
                 mBtn.innerText = "CALL ⬆️"; mBtn.style.background = "#00ff88"; mBtn.style.color="#000";
-            } else {
+            } else if(/put|down|sell/i.test(aiText.toLowerCase())) {
                 mBtn.innerText = "PUT ⬇️"; mBtn.style.background = "#ff4d4d"; mBtn.style.color="#fff";
             }
         } catch (e) {
-            chat.innerText = "Bhai, API Response mein error hai. Key check karo ya internet.";
+            chat.innerText = "Bhai, AI server ne jawab nahi diya. Key ya internet check karo.";
         }
     }
 
     function drawAILevels() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.strokeStyle = "#ff00ff"; ctx.lineWidth = 15;
-        ctx.strokeRect(canvas.width*0.5, canvas.height*0.3, 200, 100); // AI Draw Order Block
+        ctx.strokeRect(canvas.width*0.5, canvas.height*0.3, 200, 100); 
         ctx.strokeStyle = "#00d2ff";
-        ctx.beginPath(); ctx.moveTo(0, canvas.height*0.6); ctx.lineTo(canvas.width, canvas.height*0.6); ctx.stroke(); // AI Draw SNR
+        ctx.beginPath(); ctx.moveTo(0, canvas.height*0.6); ctx.lineTo(canvas.width, canvas.height*0.6); ctx.stroke();
     }
 </script>
 </body>
